@@ -1,0 +1,17 @@
+[
+  {
+    "id": "club1",
+    "name": "Urban Padel",
+    "city": "Castelnau le lez"
+  },
+  {
+    "id": "club2", 
+    "name": "My center padel",
+    "city": "Palavas les flots"
+  },
+  {
+    "id": "club3",
+    "name": "Padel Lattes",
+    "city": "Lattes"
+  }
+]
