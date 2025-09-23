@@ -2,8 +2,8 @@ import { readJsonFile } from '../../../lib/data.js'
 
 export async function GET() {
   try {
-    const friends = readJsonFile('friends.json')
-    const clubs = readJsonFile('clubs.json')
+    const friends = await readJsonFile('friends.json')
+    const clubs = await readJsonFile('clubs.json')
     
     return Response.json({ friends, clubs })
   } catch (error) {
