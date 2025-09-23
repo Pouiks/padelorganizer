@@ -25,7 +25,9 @@
     "duration": 90,
     "maxPlayers": 4,
     "price": 15,
-    "players": [],
+    "players": [
+      "Phillipe"
+    ],
     "createdAt": "2025-09-22T21:08:19.932Z"
   }
 ]

@@ -9,7 +9,7 @@ export async function POST(request, { params }) {
       return Response.json({ error: 'Nom requis' }, { status: 400 })
     }
     
-    const slots = readJsonFile('slots.json')
+    const slots = await readJsonFile('slots.json')
     const slotIndex = slots.findIndex(slot => slot.id === id)
     
     if (slotIndex === -1) {
@@ -32,7 +32,7 @@ export async function POST(request, { params }) {
     slot.players.push(name)
     slots[slotIndex] = slot
     
-    writeJsonFile('slots.json', slots)
+    await writeJsonFile('slots.json', slots)
     
     return Response.json(slot)
   } catch (error) {
