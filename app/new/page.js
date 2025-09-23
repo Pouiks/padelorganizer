@@ -46,8 +46,10 @@ export default function NewSlotPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    console.log('🚀 [CREATION] Début de la création de créneau')
     
     if (!formData.clubId || !formData.date || !formData.time) {
+      console.log('❌ [CREATION] Champs manquants:', { clubId: formData.clubId, date: formData.date, time: formData.time })
       toast.error('Veuillez remplir tous les champs obligatoires')
       return
     }
@@ -60,20 +62,30 @@ export default function NewSlotPage() {
         price: formData.price ? parseFloat(formData.price) : null
       }
       
+      console.log('📤 [CREATION] Envoi de la requête:', payload)
+      
       const response = await fetch('/api/slots', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
 
+      console.log('📥 [CREATION] Réponse reçue:', response.status, response.statusText)
+
       if (response.ok) {
+        const newSlot = await response.json()
+        console.log('✅ [CREATION] Créneau créé avec succès:', newSlot)
         toast.success('Créneau créé avec succès !')
+        console.log('🔄 [CREATION] Redirection vers la page d\'accueil')
+        // Rediriger vers la page d'accueil
         router.push('/')
       } else {
         const error = await response.json()
+        console.log('❌ [CREATION] Erreur de création:', error)
         toast.error(error.error)
       }
     } catch (error) {
+      console.log('💥 [CREATION] Exception:', error)
       toast.error('Erreur création')
     } finally {
       setSubmitting(false)

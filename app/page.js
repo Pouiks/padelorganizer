@@ -32,6 +32,18 @@ export default function HomePage() {
   }
 
   const handleJoin = async (slotId, name) => {
+    console.log('👥 [INSCRIPTION] Début inscription:', { slotId, name })
+    
+    // Optimistic update : mettre à jour immédiatement l'UI
+    setSlots(prevSlots => 
+      prevSlots.map(slot => 
+        slot.id === slotId 
+          ? { ...slot, players: [...slot.players, name] }
+          : slot
+      )
+    )
+    console.log('🔄 [INSCRIPTION] UI mise à jour (optimistic)')
+    
     try {
       const response = await fetch(`/api/slots/${slotId}/join`, {
         method: 'POST',
@@ -39,19 +51,38 @@ export default function HomePage() {
         body: JSON.stringify({ name })
       })
       
+      console.log('📥 [INSCRIPTION] Réponse:', response.status, response.statusText)
+      
       if (response.ok) {
-        loadData() // Recharger les données
+        console.log('✅ [INSCRIPTION] Succès')
         toast.success(`${name} inscrit au créneau !`)
+        // Recharger les données
+        loadData()
       } else {
+        // Annuler l'optimistic update en cas d'erreur
+        console.log('❌ [INSCRIPTION] Erreur, rollback UI')
+        loadData()
         const error = await response.json()
         toast.error(error.error)
       }
     } catch (error) {
+      // Annuler l'optimistic update en cas d'erreur
+      console.log('💥 [INSCRIPTION] Exception, rollback UI:', error)
+      loadData()
       toast.error('Erreur inscription')
     }
   }
 
   const handleLeave = async (slotId, name) => {
+    // Optimistic update : retirer immédiatement de l'UI
+    setSlots(prevSlots => 
+      prevSlots.map(slot => 
+        slot.id === slotId 
+          ? { ...slot, players: slot.players.filter(player => player !== name) }
+          : slot
+      )
+    )
+    
     try {
       const response = await fetch(`/api/slots/${slotId}/leave`, {
         method: 'POST',
@@ -60,13 +91,18 @@ export default function HomePage() {
       })
       
       if (response.ok) {
-        loadData()
         toast.success(`${name} retiré du créneau`)
+        // Optionnel : recharger en arrière-plan pour être sûr
+        loadData()
       } else {
+        // Annuler l'optimistic update en cas d'erreur
+        loadData()
         const error = await response.json()
         toast.error(error.error)
       }
     } catch (error) {
+      // Annuler l'optimistic update en cas d'erreur
+      loadData()
       toast.error('Erreur désinscription')
     }
   }
@@ -74,18 +110,27 @@ export default function HomePage() {
   const handleDelete = async (slotId) => {
     if (!confirm('Supprimer ce créneau ?')) return
     
+    console.log('🗑️ [SUPPRESSION] ID à supprimer:', slotId)
+    console.log('🗑️ [SUPPRESSION] Slots actuels:', slots.map(s => ({ id: s.id, name: s.clubName })))
+    
     try {
       const response = await fetch(`/api/slots/${slotId}`, {
         method: 'DELETE'
       })
       
+      console.log('📥 [SUPPRESSION] Réponse:', response.status, response.statusText)
+      
       if (response.ok) {
-        loadData()
+        console.log('✅ [SUPPRESSION] Succès API')
         toast.success('Créneau supprimé')
+        console.log('🔄 [SUPPRESSION] Rechargement des données...')
+        loadData()
       } else {
+        console.log('❌ [SUPPRESSION] Erreur API')
         toast.error('Erreur suppression')
       }
     } catch (error) {
+      console.log('💥 [SUPPRESSION] Exception:', error)
       toast.error('Erreur suppression')
     }
   }
