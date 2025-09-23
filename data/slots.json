@@ -1,21 +1,5 @@
 [
   {
-    "id": "1758564920177",
-    "clubId": "club2",
-    "clubName": "My center padel",
-    "clubCity": "Palavas les flots",
-    "date": "2025-09-28",
-    "time": "19:00",
-    "duration": 120,
-    "maxPlayers": 4,
-    "price": 20,
-    "players": [
-      "Carenza",
-      "Virgile"
-    ],
-    "createdAt": "2025-09-22T18:15:20.177Z"
-  },
-  {
     "id": "1758565428253",
     "clubId": "club2",
     "clubName": "My center padel",
@@ -25,7 +9,23 @@
     "duration": 60,
     "maxPlayers": 4,
     "price": 10,
-    "players": [],
+    "players": [
+      "Carenza",
+      "Virgile"
+    ],
     "createdAt": "2025-09-22T18:23:48.253Z"
+  },
+  {
+    "id": "1758575299932",
+    "clubId": "club3",
+    "clubName": "Padel Lattes",
+    "clubCity": "Lattes",
+    "date": "2025-09-27",
+    "time": "19:00",
+    "duration": 90,
+    "maxPlayers": 4,
+    "price": 15,
+    "players": [],
+    "createdAt": "2025-09-22T21:08:19.932Z"
   }
 ]
