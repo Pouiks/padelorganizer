@@ -1,4 +1,4 @@
-import { await readJsonFile, await writeJsonFile, generateId } from '../../../lib/data.js'
+import { readJsonFile, writeJsonFile, generateId } from '../../../lib/data.js'
 
 // Lister les créneaux
 export async function GET() {

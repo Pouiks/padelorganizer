@@ -1,4 +1,4 @@
-import { await readJsonFile, await writeJsonFile } from '../../../../../lib/data.js'
+import { readJsonFile, writeJsonFile } from '../../../../../lib/data.js'
 
 export async function POST(request, { params }) {
   try {
