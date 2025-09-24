@@ -35,13 +35,15 @@ export default function HomePage() {
     console.log('👥 [INSCRIPTION] Début inscription:', { slotId, name })
     
     // Optimistic update : mettre à jour immédiatement l'UI
-    setSlots(prevSlots => 
-      prevSlots.map(slot => 
+    setSlots(prevSlots => {
+      const updatedSlots = prevSlots.map(slot => 
         slot.id === slotId 
           ? { ...slot, players: [...slot.players, name] }
           : slot
       )
-    )
+      console.log('🔄 [INSCRIPTION] UI mise à jour (optimistic) - nouveau state:', updatedSlots.find(s => s.id === slotId)?.players)
+      return updatedSlots
+    })
     console.log('🔄 [INSCRIPTION] UI mise à jour (optimistic)')
     
     try {
@@ -56,8 +58,11 @@ export default function HomePage() {
       if (response.ok) {
         console.log('✅ [INSCRIPTION] Succès')
         toast.success(`${name} inscrit au créneau !`)
-        // Pas besoin de recharger - l'optimistic update est déjà correct
-        // loadData()
+        // Recharger les données après un petit délai pour synchroniser avec la BDD
+        setTimeout(() => {
+          console.log('🔄 [INSCRIPTION] Rechargement différé des données')
+          loadData()
+        }, 500)
       } else {
         // Annuler l'optimistic update en cas d'erreur
         console.log('❌ [INSCRIPTION] Erreur, rollback UI')
