@@ -56,8 +56,8 @@ export default function HomePage() {
       if (response.ok) {
         console.log('✅ [INSCRIPTION] Succès')
         toast.success(`${name} inscrit au créneau !`)
-        // Recharger les données
-        loadData()
+        // Pas besoin de recharger - l'optimistic update est déjà correct
+        // loadData()
       } else {
         // Annuler l'optimistic update en cas d'erreur
         console.log('❌ [INSCRIPTION] Erreur, rollback UI')
@@ -92,8 +92,8 @@ export default function HomePage() {
       
       if (response.ok) {
         toast.success(`${name} retiré du créneau`)
-        // Optionnel : recharger en arrière-plan pour être sûr
-        loadData()
+        // Pas besoin de recharger - l'optimistic update est déjà correct
+        // loadData()
       } else {
         // Annuler l'optimistic update en cas d'erreur
         loadData()
@@ -127,8 +127,8 @@ export default function HomePage() {
       if (response.ok) {
         console.log('✅ [SUPPRESSION] Succès API')
         toast.success('Créneau supprimé')
-        // Optionnel : recharger en arrière-plan pour être sûr
-        loadData()
+        // Pas besoin de recharger - l'optimistic update a déjà supprimé le créneau
+        // loadData()
       } else {
         console.log('❌ [SUPPRESSION] Erreur API, rollback UI')
         // Annuler l'optimistic update en cas d'erreur
