@@ -11,16 +11,20 @@ export default function HomePage() {
   useEffect(() => {
     loadData()
     
-    // Si on revient d'une création, forcer un rechargement après 2 secondes
+    // Si on revient d'une création, ajouter le nouveau créneau
     const urlParams = new URLSearchParams(window.location.search)
-    if (urlParams.get('refresh') === 'true') {
-      console.log('🔄 [ACCUEIL] Rechargement forcé après création')
-      setTimeout(() => {
-        loadData()
-      }, 2000)
-      
-      // Nettoyer l'URL
-      window.history.replaceState({}, '', window.location.pathname)
+    const newSlotData = urlParams.get('newSlot')
+    if (newSlotData) {
+      try {
+        const newSlot = JSON.parse(decodeURIComponent(newSlotData))
+        console.log('🆕 [ACCUEIL] Ajout du nouveau créneau:', newSlot)
+        setSlots(prevSlots => [...prevSlots, newSlot])
+        
+        // Nettoyer l'URL
+        window.history.replaceState({}, '', window.location.pathname)
+      } catch (error) {
+        console.error('Erreur parsing nouveau créneau:', error)
+      }
     }
   }, [])
 
@@ -46,18 +50,6 @@ export default function HomePage() {
   const handleJoin = async (slotId, name) => {
     console.log('👥 [INSCRIPTION] Début inscription:', { slotId, name })
     
-    // Optimistic update : mettre à jour immédiatement l'UI
-    setSlots(prevSlots => {
-      const updatedSlots = prevSlots.map(slot => 
-        slot.id === slotId 
-          ? { ...slot, players: [...slot.players, name] }
-          : slot
-      )
-      console.log('🔄 [INSCRIPTION] UI mise à jour (optimistic) - nouveau state:', updatedSlots.find(s => s.id === slotId)?.players)
-      return updatedSlots
-    })
-    console.log('🔄 [INSCRIPTION] UI mise à jour (optimistic)')
-    
     try {
       const response = await fetch(`/api/slots/${slotId}/join`, {
         method: 'POST',
@@ -68,38 +60,30 @@ export default function HomePage() {
       console.log('📥 [INSCRIPTION] Réponse:', response.status, response.statusText)
       
       if (response.ok) {
-        console.log('✅ [INSCRIPTION] Succès')
+        const updatedSlot = await response.json()
+        console.log('✅ [INSCRIPTION] Succès - créneau mis à jour:', updatedSlot)
+        
+        // Mettre à jour le créneau avec les données de l'API
+        setSlots(prevSlots => 
+          prevSlots.map(slot => 
+            slot.id === slotId ? updatedSlot : slot
+          )
+        )
+        
         toast.success(`${name} inscrit au créneau !`)
-        // PAS de rechargement - l'optimistic update est la vérité
-        console.log('🎯 [INSCRIPTION] Pas de rechargement - optimistic update conservé')
       } else {
-        // Annuler l'optimistic update en cas d'erreur
-        console.log('❌ [INSCRIPTION] Erreur, rollback UI')
-        loadData()
         const error = await response.json()
+        console.log('❌ [INSCRIPTION] Erreur:', error)
         toast.error(error.error)
       }
     } catch (error) {
-      // Annuler l'optimistic update en cas d'erreur
-      console.log('💥 [INSCRIPTION] Exception, rollback UI:', error)
-      loadData()
+      console.log('💥 [INSCRIPTION] Exception:', error)
       toast.error('Erreur inscription')
     }
   }
 
   const handleLeave = async (slotId, name) => {
     console.log('👥 [DESINSCRIPTION] Début désinscription:', { slotId, name })
-    
-    // Optimistic update : retirer immédiatement de l'UI
-    setSlots(prevSlots => {
-      const updatedSlots = prevSlots.map(slot => 
-        slot.id === slotId 
-          ? { ...slot, players: slot.players.filter(player => player !== name) }
-          : slot
-      )
-      console.log('🔄 [DESINSCRIPTION] UI mise à jour (optimistic) - nouveau state:', updatedSlots.find(s => s.id === slotId)?.players)
-      return updatedSlots
-    })
     
     try {
       const response = await fetch(`/api/slots/${slotId}/leave`, {
@@ -109,21 +93,24 @@ export default function HomePage() {
       })
       
       if (response.ok) {
-        console.log('✅ [DESINSCRIPTION] Succès')
+        const updatedSlot = await response.json()
+        console.log('✅ [DESINSCRIPTION] Succès - créneau mis à jour:', updatedSlot)
+        
+        // Mettre à jour le créneau avec les données de l'API
+        setSlots(prevSlots => 
+          prevSlots.map(slot => 
+            slot.id === slotId ? updatedSlot : slot
+          )
+        )
+        
         toast.success(`${name} retiré du créneau`)
-        // PAS de rechargement - l'optimistic update est la vérité
-        console.log('🎯 [DESINSCRIPTION] Pas de rechargement - optimistic update conservé')
       } else {
-        // Annuler l'optimistic update en cas d'erreur
-        console.log('❌ [DESINSCRIPTION] Erreur, rollback UI')
-        loadData()
         const error = await response.json()
+        console.log('❌ [DESINSCRIPTION] Erreur:', error)
         toast.error(error.error)
       }
     } catch (error) {
-      // Annuler l'optimistic update en cas d'erreur
-      console.log('💥 [DESINSCRIPTION] Exception, rollback UI:', error)
-      loadData()
+      console.log('💥 [DESINSCRIPTION] Exception:', error)
       toast.error('Erreur désinscription')
     }
   }
@@ -132,11 +119,6 @@ export default function HomePage() {
     if (!confirm('Supprimer ce créneau ?')) return
     
     console.log('🗑️ [SUPPRESSION] ID à supprimer:', slotId)
-    console.log('🗑️ [SUPPRESSION] Slots actuels:', slots.map(s => ({ id: s.id, name: s.clubName })))
-    
-    // Optimistic update : retirer immédiatement de l'UI
-    setSlots(prevSlots => prevSlots.filter(slot => slot.id !== slotId))
-    console.log('🔄 [SUPPRESSION] UI mise à jour (optimistic)')
     
     try {
       const response = await fetch(`/api/slots/${slotId}`, {
@@ -147,19 +129,17 @@ export default function HomePage() {
       
       if (response.ok) {
         console.log('✅ [SUPPRESSION] Succès API')
+        
+        // Retirer le créneau du state
+        setSlots(prevSlots => prevSlots.filter(slot => slot.id !== slotId))
+        
         toast.success('Créneau supprimé')
-        // Pas besoin de recharger - l'optimistic update a déjà supprimé le créneau
-        // loadData()
       } else {
-        console.log('❌ [SUPPRESSION] Erreur API, rollback UI')
-        // Annuler l'optimistic update en cas d'erreur
-        loadData()
+        console.log('❌ [SUPPRESSION] Erreur API')
         toast.error('Erreur suppression')
       }
     } catch (error) {
-      console.log('💥 [SUPPRESSION] Exception, rollback UI:', error)
-      // Annuler l'optimistic update en cas d'erreur
-      loadData()
+      console.log('💥 [SUPPRESSION] Exception:', error)
       toast.error('Erreur suppression')
     }
   }
