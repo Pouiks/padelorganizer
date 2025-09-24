@@ -9,23 +9,28 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadData()
-    
-    // Si on revient d'une création, ajouter le nouveau créneau
-    const urlParams = new URLSearchParams(window.location.search)
-    const newSlotData = urlParams.get('newSlot')
-    if (newSlotData) {
-      try {
-        const newSlot = JSON.parse(decodeURIComponent(newSlotData))
-        console.log('🆕 [ACCUEIL] Ajout du nouveau créneau:', newSlot)
-        setSlots(prevSlots => [...prevSlots, newSlot])
-        
-        // Nettoyer l'URL
-        window.history.replaceState({}, '', window.location.pathname)
-      } catch (error) {
-        console.error('Erreur parsing nouveau créneau:', error)
+    const initPage = async () => {
+      // D'abord charger les données existantes
+      await loadData()
+      
+      // Puis ajouter le nouveau créneau si présent
+      const urlParams = new URLSearchParams(window.location.search)
+      const newSlotData = urlParams.get('newSlot')
+      if (newSlotData) {
+        try {
+          const newSlot = JSON.parse(decodeURIComponent(newSlotData))
+          console.log('🆕 [ACCUEIL] Ajout du nouveau créneau après chargement:', newSlot)
+          setSlots(prevSlots => [...prevSlots, newSlot])
+          
+          // Nettoyer l'URL
+          window.history.replaceState({}, '', window.location.pathname)
+        } catch (error) {
+          console.error('Erreur parsing nouveau créneau:', error)
+        }
       }
     }
+    
+    initPage()
   }, [])
 
   const loadData = async () => {
