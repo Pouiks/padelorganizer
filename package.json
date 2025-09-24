@@ -5,13 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "migrate": "node scripts/migrate-to-blob.js"
+    "start": "next start"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.1",
-    "@vercel/blob": "^2.0.0",
-    "@vercel/postgres": "^0.10.0",
     "dotenv": "^17.2.2",
     "next": "^14.0.0",
     "react": "^18.0.0",
