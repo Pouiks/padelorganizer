@@ -79,14 +79,18 @@ export default function HomePage() {
   }
 
   const handleLeave = async (slotId, name) => {
+    console.log('👥 [DESINSCRIPTION] Début désinscription:', { slotId, name })
+    
     // Optimistic update : retirer immédiatement de l'UI
-    setSlots(prevSlots => 
-      prevSlots.map(slot => 
+    setSlots(prevSlots => {
+      const updatedSlots = prevSlots.map(slot => 
         slot.id === slotId 
           ? { ...slot, players: slot.players.filter(player => player !== name) }
           : slot
       )
-    )
+      console.log('🔄 [DESINSCRIPTION] UI mise à jour (optimistic) - nouveau state:', updatedSlots.find(s => s.id === slotId)?.players)
+      return updatedSlots
+    })
     
     try {
       const response = await fetch(`/api/slots/${slotId}/leave`, {
@@ -96,17 +100,23 @@ export default function HomePage() {
       })
       
       if (response.ok) {
+        console.log('✅ [DESINSCRIPTION] Succès')
         toast.success(`${name} retiré du créneau`)
-        // Pas besoin de recharger - l'optimistic update est déjà correct
-        // loadData()
+        // Recharger les données après un petit délai pour synchroniser avec la BDD
+        setTimeout(() => {
+          console.log('🔄 [DESINSCRIPTION] Rechargement différé des données')
+          loadData()
+        }, 500)
       } else {
         // Annuler l'optimistic update en cas d'erreur
+        console.log('❌ [DESINSCRIPTION] Erreur, rollback UI')
         loadData()
         const error = await response.json()
         toast.error(error.error)
       }
     } catch (error) {
       // Annuler l'optimistic update en cas d'erreur
+      console.log('💥 [DESINSCRIPTION] Exception, rollback UI:', error)
       loadData()
       toast.error('Erreur désinscription')
     }
