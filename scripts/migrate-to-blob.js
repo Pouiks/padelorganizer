@@ -56,7 +56,8 @@ async function migrateFile(filename) {
       const jsonString = JSON.stringify(defaultData, null, 2)
       await put(filename, jsonString, {
         access: 'public',
-        contentType: 'application/json'
+        contentType: 'application/json',
+        allowOverwrite: true
       })
       
       console.log(`✅ ${filename} créé dans le blob storage avec des données par défaut`)
@@ -71,7 +72,8 @@ async function migrateFile(filename) {
     
     const blob = await put(filename, fileContent, {
       access: 'public',
-      contentType: 'application/json'
+      contentType: 'application/json',
+      allowOverwrite: true
     })
     
     console.log(`✅ ${filename} migré avec succès`)

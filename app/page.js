@@ -113,6 +113,10 @@ export default function HomePage() {
     console.log('🗑️ [SUPPRESSION] ID à supprimer:', slotId)
     console.log('🗑️ [SUPPRESSION] Slots actuels:', slots.map(s => ({ id: s.id, name: s.clubName })))
     
+    // Optimistic update : retirer immédiatement de l'UI
+    setSlots(prevSlots => prevSlots.filter(slot => slot.id !== slotId))
+    console.log('🔄 [SUPPRESSION] UI mise à jour (optimistic)')
+    
     try {
       const response = await fetch(`/api/slots/${slotId}`, {
         method: 'DELETE'
@@ -123,14 +127,18 @@ export default function HomePage() {
       if (response.ok) {
         console.log('✅ [SUPPRESSION] Succès API')
         toast.success('Créneau supprimé')
-        console.log('🔄 [SUPPRESSION] Rechargement des données...')
+        // Optionnel : recharger en arrière-plan pour être sûr
         loadData()
       } else {
-        console.log('❌ [SUPPRESSION] Erreur API')
+        console.log('❌ [SUPPRESSION] Erreur API, rollback UI')
+        // Annuler l'optimistic update en cas d'erreur
+        loadData()
         toast.error('Erreur suppression')
       }
     } catch (error) {
-      console.log('💥 [SUPPRESSION] Exception:', error)
+      console.log('💥 [SUPPRESSION] Exception, rollback UI:', error)
+      // Annuler l'optimistic update en cas d'erreur
+      loadData()
       toast.error('Erreur suppression')
     }
   }

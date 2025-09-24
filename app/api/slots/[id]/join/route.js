@@ -1,7 +1,8 @@
-import { readJsonFile, writeJsonFile } from '../../../../../lib/data.js'
+import { joinSlot, initDatabase } from '../../../../../lib/db.js'
 
 export async function POST(request, { params }) {
   try {
+    await initDatabase()
     const { name } = await request.json()
     const { id } = params
     
@@ -9,34 +10,18 @@ export async function POST(request, { params }) {
       return Response.json({ error: 'Nom requis' }, { status: 400 })
     }
     
-    const slots = await readJsonFile('slots.json')
-    const slotIndex = slots.findIndex(slot => slot.id === id)
-    
-    if (slotIndex === -1) {
-      return Response.json({ error: 'Créneau non trouvé' }, { status: 404 })
-    }
-    
-    const slot = slots[slotIndex]
-    
-    // Vérifier si déjà inscrit
-    if (slot.players.includes(name)) {
-      return Response.json({ error: 'Déjà inscrit' }, { status: 400 })
-    }
-    
-    // Vérifier si complet
-    if (slot.players.length >= slot.maxPlayers) {
-      return Response.json({ error: 'Complet' }, { status: 400 })
-    }
-    
-    // Ajouter le joueur
-    slot.players.push(name)
-    slots[slotIndex] = slot
-    
-    await writeJsonFile('slots.json', slots)
-    
+    const slot = await joinSlot(id, name)
     return Response.json(slot)
   } catch (error) {
     console.error('Erreur:', error)
+    
+    if (error.message === 'Créneau non trouvé') {
+      return Response.json({ error: error.message }, { status: 404 })
+    }
+    if (error.message === 'Déjà inscrit' || error.message === 'Complet') {
+      return Response.json({ error: error.message }, { status: 400 })
+    }
+    
     return Response.json({ error: 'Erreur inscription' }, { status: 500 })
   }
 }

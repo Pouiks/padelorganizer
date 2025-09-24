@@ -1,9 +1,10 @@
-import { readJsonFile, writeJsonFile, generateId } from '../../../lib/data.js'
+import { getSlots, createSlot, getClubs, initDatabase } from '../../../lib/db.js'
 
 // Lister les créneaux
 export async function GET() {
   try {
-    const slots = await readJsonFile('slots.json')
+    await initDatabase()
+    const slots = await getSlots()
     return Response.json(slots)
   } catch (error) {
     console.error('Erreur:', error)
@@ -14,33 +15,26 @@ export async function GET() {
 // Créer un créneau
 export async function POST(request) {
   try {
+    await initDatabase()
     const { clubId, date, time, duration, maxPlayers, price } = await request.json()
     
-    const clubs = await readJsonFile('clubs.json')
+    const clubs = await getClubs()
     const club = clubs.find(c => c.id === clubId)
     
     if (!club) {
       return Response.json({ error: 'Club non trouvé' }, { status: 400 })
     }
     
-    const slots = await readJsonFile('slots.json')
-    
-    const newSlot = {
-      id: generateId(),
+    const newSlot = await createSlot({
       clubId,
       clubName: club.name,
       clubCity: club.city,
       date,
       time,
-      duration: duration || 90,
-      maxPlayers: maxPlayers || 4,
-      price: price || null,
-      players: [],
-      createdAt: new Date().toISOString()
-    }
-    
-    slots.push(newSlot)
-    await writeJsonFile('slots.json', slots)
+      duration,
+      maxPlayers,
+      price
+    })
     
     return Response.json(newSlot)
   } catch (error) {

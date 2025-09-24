@@ -1,9 +1,10 @@
-import { readJsonFile } from '../../../lib/data.js'
+import { getFriends, getClubs, initDatabase } from '../../../lib/db.js'
 
 export async function GET() {
   try {
-    const friends = await readJsonFile('friends.json')
-    const clubs = await readJsonFile('clubs.json')
+    await initDatabase()
+    const friends = await getFriends()
+    const clubs = await getClubs()
     
     return Response.json({ friends, clubs })
   } catch (error) {
