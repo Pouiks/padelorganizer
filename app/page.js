@@ -58,11 +58,8 @@ export default function HomePage() {
       if (response.ok) {
         console.log('✅ [INSCRIPTION] Succès')
         toast.success(`${name} inscrit au créneau !`)
-        // Recharger les données après un petit délai pour synchroniser avec la BDD
-        setTimeout(() => {
-          console.log('🔄 [INSCRIPTION] Rechargement différé des données')
-          loadData()
-        }, 500)
+        // PAS de rechargement - l'optimistic update est la vérité
+        console.log('🎯 [INSCRIPTION] Pas de rechargement - optimistic update conservé')
       } else {
         // Annuler l'optimistic update en cas d'erreur
         console.log('❌ [INSCRIPTION] Erreur, rollback UI')
@@ -102,11 +99,8 @@ export default function HomePage() {
       if (response.ok) {
         console.log('✅ [DESINSCRIPTION] Succès')
         toast.success(`${name} retiré du créneau`)
-        // Recharger les données après un petit délai pour synchroniser avec la BDD
-        setTimeout(() => {
-          console.log('🔄 [DESINSCRIPTION] Rechargement différé des données')
-          loadData()
-        }, 500)
+        // PAS de rechargement - l'optimistic update est la vérité
+        console.log('🎯 [DESINSCRIPTION] Pas de rechargement - optimistic update conservé')
       } else {
         // Annuler l'optimistic update en cas d'erreur
         console.log('❌ [DESINSCRIPTION] Erreur, rollback UI')
