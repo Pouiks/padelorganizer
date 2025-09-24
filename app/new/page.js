@@ -76,10 +76,10 @@ export default function NewSlotPage() {
         const newSlot = await response.json()
         console.log('✅ [CREATION] Créneau créé avec succès:', newSlot)
         toast.success('Créneau créé avec succès !')
-        console.log('🔄 [CREATION] Redirection vers la page d\'accueil SANS rechargement')
-        // Attendre un peu pour que le toast soit visible, puis rediriger
+        console.log('🔄 [CREATION] Redirection vers la page d\'accueil avec rechargement forcé')
+        // Attendre un peu pour que le toast soit visible, puis rediriger avec paramètre refresh
         setTimeout(() => {
-          router.push('/')
+          router.push('/?refresh=true')
         }, 1500)
       } else {
         const error = await response.json()

@@ -10,6 +10,18 @@ export default function HomePage() {
 
   useEffect(() => {
     loadData()
+    
+    // Si on revient d'une création, forcer un rechargement après 2 secondes
+    const urlParams = new URLSearchParams(window.location.search)
+    if (urlParams.get('refresh') === 'true') {
+      console.log('🔄 [ACCUEIL] Rechargement forcé après création')
+      setTimeout(() => {
+        loadData()
+      }, 2000)
+      
+      // Nettoyer l'URL
+      window.history.replaceState({}, '', window.location.pathname)
+    }
   }, [])
 
   const loadData = async () => {
