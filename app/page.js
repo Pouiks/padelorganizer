@@ -67,13 +67,16 @@ export default function HomePage() {
       if (response.ok) {
         const updatedSlot = await response.json()
         console.log('✅ [INSCRIPTION] Succès - créneau mis à jour:', updatedSlot)
+        console.log('🔍 [INSCRIPTION] Players dans la réponse:', updatedSlot.players)
         
         // Mettre à jour le créneau avec les données de l'API
-        setSlots(prevSlots => 
-          prevSlots.map(slot => 
+        setSlots(prevSlots => {
+          const newSlots = prevSlots.map(slot => 
             slot.id === slotId ? updatedSlot : slot
           )
-        )
+          console.log('🔄 [INSCRIPTION] Nouveau state après mise à jour:', newSlots.find(s => s.id === slotId)?.players)
+          return newSlots
+        })
         
         toast.success(`${name} inscrit au créneau !`)
       } else {
