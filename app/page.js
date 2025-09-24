@@ -34,19 +34,31 @@ export default function HomePage() {
   }, [])
 
   const loadData = async () => {
+    console.log('📊 [CHARGEMENT] Début du chargement des données')
     try {
       const [configRes, slotsRes] = await Promise.all([
         fetch('/api/config'),
         fetch('/api/slots')
       ])
       
+      console.log('📊 [CHARGEMENT] Réponses API reçues:', {
+        config: configRes.status,
+        slots: slotsRes.status
+      })
+      
       const config = await configRes.json()
       const slotsData = await slotsRes.json()
       
+      console.log('📊 [CHARGEMENT] Données reçues de la base:')
+      console.log('👥 [CHARGEMENT] Amis:', config.friends?.length || 0, config.friends)
+      console.log('🎾 [CHARGEMENT] Créneaux:', slotsData?.length || 0, slotsData)
+      
       setFriends(config.friends)
       setSlots(slotsData)
+      
+      console.log('✅ [CHARGEMENT] État mis à jour avec les données de la base')
     } catch (error) {
-      console.error('Erreur:', error)
+      console.error('❌ [CHARGEMENT] Erreur:', error)
     } finally {
       setLoading(false)
     }
